@@ -57,12 +57,12 @@ jobs:
         with:
           serviceAccountJson: service_account.json  # Path to service account JSON file
           packageName: ${{ secrets.PACKAGE_NAME }}  # Your app's package name
-          releaseFiles: app/build/outputs/bundle/release/app-release.aab  # Path to the AAB
+          releaseFiles: build/app/outputs/bundle/release/app-release.aab
           track: internal  # Upload to Internal Testing track
 
       - name: Push to Releases
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "app/build/outputs/bundle/release/app-release.aab"
+          artifacts: "build/app/outputs/bundle/release/app-release.aab"
           tag: v1.0.${{ github.run_number }}
           token: ${{ secrets.TOKEN }}
