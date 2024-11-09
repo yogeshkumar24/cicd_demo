@@ -32,9 +32,6 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build Android App Bundle
-        run: flutter build appbundle --release
-
       - name: Decode and set up Keystore
         env:
           KEYSTORE: ${{ secrets.KEYSTORE }}
@@ -49,30 +46,23 @@ jobs:
           echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
           echo "storeFile=/tmp/my-release-key.jks" >> android/key.properties
 
-      - name: Check file path length
-        run: |
-          echo "File path: $(realpath build/app/outputs/bundle/release/app-release.aab)"
-          echo "File path length: $(echo $(realpath build/app/outputs/bundle/release/app-release.aab) | wc -c)"
+      - name: Build Android App Bundle (Signed)
+        run: flutter build appbundle --release
 
-      - name: Move build folder to a simpler path
-        run: |
-          mv build /tmp/build
-          ls -lR /tmp/build/app/outputs/bundle/release/
-
-      - name: Ensure AAB file has correct permissions
-        run: chmod 644 /tmp/build/app/outputs/bundle/release/app-release.aab
+      - name: Create service_account.json FROM secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON
+        run: echo '${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}' > service_account.json
 
       - name: Upload to Google Play Internal Testing
         uses: r0adkll/upload-google-play@v1
         with:
-          serviceAccountJson: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
-          packageName: ${{ secrets.PACKAGE_NAME }}
-          releaseFiles: /tmp/build/app/outputs/bundle/release/app-release.aab  # Updated path
-          track: internal  # Internal Testing Track
+          serviceAccountJson: service_account.json  # Path to service account JSON file
+          packageName: ${{ secrets.PACKAGE_NAME }}  # Your app's package name
+          releaseFiles: app/build/outputs/bundle/release/app-release.aab  # Path to the AAB
+          track: internal  # Upload to Internal Testing track
 
       - name: Push to Releases
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "/tmp/build/app/outputs/bundle/release/app-release.aab"
+          artifacts: "app/build/outputs/bundle/release/app-release.aab"
           tag: v1.0.${{ github.run_number }}
           token: ${{ secrets.TOKEN }}
