@@ -49,25 +49,30 @@ jobs:
           echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
           echo "storeFile=/tmp/my-release-key.jks" >> android/key.properties
 
-      - name: Verify the AAB file
-        run: ls -l build/app/outputs/bundle/release/
-
-      - name: Move AAB to a simpler path
+      - name: Check file path length
         run: |
-          mkdir -p /tmp/aab
-          cp build/app/outputs/bundle/release/app-release.aab /tmp/aab/
+          echo "File path: $(realpath build/app/outputs/bundle/release/app-release.aab)"
+          echo "File path length: $(echo $(realpath build/app/outputs/bundle/release/app-release.aab) | wc -c)"
+
+      - name: Move build folder to a simpler path
+        run: |
+          mv build /tmp/build
+          ls -lR /tmp/build/app/outputs/bundle/release/
+
+      - name: Ensure AAB file has correct permissions
+        run: chmod 644 /tmp/build/app/outputs/bundle/release/app-release.aab
 
       - name: Upload to Google Play Internal Testing
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJson: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: ${{ secrets.PACKAGE_NAME }}
-          releaseFiles: /tmp/aab/app-release.aab
-          track: internal
+          releaseFiles: /tmp/build/app/outputs/bundle/release/app-release.aab  # Updated path
+          track: internal  # Internal Testing Track
 
       - name: Push to Releases
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "/tmp/aab/app-release.aab"
+          artifacts: "/tmp/build/app/outputs/bundle/release/app-release.aab"
           tag: v1.0.${{ github.run_number }}
           token: ${{ secrets.TOKEN }}
