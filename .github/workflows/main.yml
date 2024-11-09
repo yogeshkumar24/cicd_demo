@@ -52,17 +52,22 @@ jobs:
       - name: Verify the AAB file
         run: ls -l build/app/outputs/bundle/release/
 
-      - name: Upload to Google Play
+      - name: Move AAB to a simpler path
+        run: |
+          mkdir -p /tmp/aab
+          cp build/app/outputs/bundle/release/app-release.aab /tmp/aab/
+
+      - name: Upload to Google Play Internal Testing
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJson: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: ${{ secrets.PACKAGE_NAME }}
-          releaseFiles: build/app/outputs/bundle/release/app-release.aab
-          track: production
+          releaseFiles: /tmp/aab/app-release.aab
+          track: internal
 
       - name: Push to Releases
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "build/app/outputs/bundle/release/app-release.aab"
+          artifacts: "/tmp/aab/app-release.aab"
           tag: v1.0.${{ github.run_number }}
           token: ${{ secrets.TOKEN }}
