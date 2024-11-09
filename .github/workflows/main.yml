@@ -59,6 +59,9 @@ jobs:
           packageName: ${{ secrets.PACKAGE_NAME }}  # Your app's package name
           releaseFiles: build/app/outputs/bundle/release/app-release.aab
           track: internal  # Upload to Internal Testing track
+          status: draft  # Ensures the release is created in draft status
+          inAppUpdatePriority: 0
+          changesNotSentForReview: false
 
       - name: Push to Releases
         uses: ncipollo/release-action@v1
