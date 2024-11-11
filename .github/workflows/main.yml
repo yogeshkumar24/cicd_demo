@@ -86,7 +86,7 @@ jobs:
       - name: Upload to Google Play Internal Testing
         run: |
           cd android/fastlane
-          fastlane deploy_internal
+          fastlane android deploy_internal
 
       # Push to GitHub Releases
       - name: Push to Releases
