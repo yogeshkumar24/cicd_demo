@@ -29,7 +29,6 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-#          flutter-version: '3.19.0'
           channel: 'stable'
           architecture: x64
 
@@ -57,22 +56,22 @@ jobs:
           echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
           echo "storeFile=/tmp/my-release-key.jks" >> android/key.properties
 
-      # Create service_account.json for Google Play upload
+      # Create service_account.json for Google Play upload in /tmp directory
       - name: Create service_account.json FROM secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON
-        run: echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" | base64 --decode > android/service_account.json
+        run: echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" | base64 --decode > /tmp/service-account.json
         env:
           GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: service_account.json
 
-      # Print the path of service_account.json
+      # Print the path of service_account.json for debugging
       - name: Print path of service_account.json
         run: |
-          echo "Path of service_account.json: $(pwd)/android/service_account.json"
+          echo "Path of service_account.json: $(pwd)/tmp/service-account.json"
 
       # Print the length (size in bytes) of service_account.json
       - name: Print length of service_account.json
         run: |
-          if [ -f service_account.json ]; then
-            echo "Length of service_account.json: $(wc -c < service_account.json) bytes"
+          if [ -f /tmp/service-account.json ]; then
+            echo "Length of service_account.json: $(wc -c < /tmp/service-account.json) bytes"
           else
             echo "service_account.json not found."
           fi
