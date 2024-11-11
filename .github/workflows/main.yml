@@ -63,6 +63,11 @@ jobs:
         env:
           GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: service_account.json
 
+      # Print the path of service_account.json
+      - name: Print path of service_account.json
+        run: |
+          echo "Path of service_account.json: $(pwd)/android/service_account.json"
+
       # Print the length (size in bytes) of service_account.json
       - name: Print length of service_account.json
         run: |
