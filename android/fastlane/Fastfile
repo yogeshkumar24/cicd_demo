@@ -1,6 +1,5 @@
 require 'yaml'
 
-
 class Properties < Hash
   def initialize(file)
     if File.exist?(file)
@@ -20,25 +19,25 @@ class Properties < Hash
   end
 end
 
-      desc "Increment version code in local.properties"
-      lane :increment_version_code do
-        # Determine the path to the local.properties file
-        local_properties_path = File.join(File.dirname(__FILE__), "../local.properties")
+platform :android do
+  desc "Increment version code in local.properties"
+  lane :increment_version_code do
+    # Determine the path to the local.properties file
+    local_properties_path = File.join(File.dirname(__FILE__), "../local.properties")
 
-        # Load the properties from the local.properties file
-        local_properties = Properties.new(local_properties_path)
+    # Load the properties from the local.properties file
+    local_properties = Properties.new(local_properties_path)
 
-        # Retrieve the current version code, increment it, and update the file
-        current_version_code = local_properties['flutter.versionCode']&.to_i || 1
-        new_version_code = current_version_code + 1
-        local_properties['flutter.versionCode'] = new_version_code.to_s
+    # Retrieve the current version code, increment it, and update the file
+    current_version_code = local_properties['flutter.versionCode']&.to_i || 1
+    new_version_code = current_version_code + 1
+    local_properties['flutter.versionCode'] = new_version_code.to_s
 
-        # Save the updated properties back to the file
-        local_properties.store(local_properties_path)
+    # Save the updated properties back to the file
+    local_properties.store(local_properties_path)
 
-        UI.message("Version code updated from #{current_version_code} to #{new_version_code}")
-      end
-
+    UI.message("Version code updated from #{current_version_code} to #{new_version_code}")
+  end
 
   desc "Submit a new version to the internal track in Google Play"
   lane :deploy_internal do
@@ -70,7 +69,7 @@ end
   end
 
   lane :build_and_deploy do
-      increment_version_code
-      deploy_internal
-    end
+    increment_version_code
+    deploy_internal
+  end
 end
