@@ -18,7 +18,7 @@ platform :android do
     )
 
     # Use the correct path for the service account JSON
-      json_path = "android/service_account.json"
+      json_path = ".github/workflows/service_account.json"
 
     # Upload to the internal track
     upload_to_play_store(

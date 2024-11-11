@@ -67,7 +67,7 @@ jobs:
       - name: Print length of service_account.json
         run: |
           if [ -f android/service_account.json ]; then
-            echo "Length of service_account.json: $(wc -c < android/service_account.json) bytes"
+            echo "Length of service_account.json: $(wc -c < service_account.json) bytes"
           else
             echo "service_account.json not found."
           fi
