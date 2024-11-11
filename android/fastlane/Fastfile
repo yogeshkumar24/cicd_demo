@@ -7,7 +7,7 @@ platform :android do
     )
   end
 
-  desc "Submit a new version to the internal track in the Google Play"
+  desc "Submit a new version to the internal track in Google Play"
   lane :deploy_internal do
     gradle(task: "clean")
     gradle(
@@ -21,7 +21,10 @@ platform :android do
     # Upload to the internal track
     upload_to_play_store(
       track: 'internal',
-      json_key: json_path
+      json_key: json_path,
+      skip_upload_metadata: true,   # Skip metadata upload
+      skip_upload_images: true,     # Skip images upload
+      skip_upload_screenshots: true # Skip screenshots upload
     )
 
     # Clean up the service account JSON after use
