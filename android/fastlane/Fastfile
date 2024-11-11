@@ -17,7 +17,7 @@ platform :android do
       build_type: 'Release'
     )
 
-    json_path = "jsonFile.json"
+    json_path = "android/jsonFile.json"
     File.write(json_path,ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON'])
 
     # Upload to the internal track
