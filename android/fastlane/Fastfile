@@ -17,8 +17,8 @@ platform :android do
       build_type: 'Release'
     )
 
-    json_path = "android/jsonFile.json"
-    File.write(json_path,ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON'])
+    # Use the correct path for the service account JSON
+      json_path = "android/service_account.json"
 
     # Upload to the internal track
     upload_to_play_store(
@@ -26,7 +26,6 @@ platform :android do
       json_key: json_path
     )
 
-    # Optional: Clean up the service account JSON after use
-    sh "rm service-account.json"
+     sh "rm #{json_path}"
   end
 end
