@@ -1,0 +1,23 @@
+# android/fastlane/Fastfile
+
+default_platform(:android)
+
+platform :android do
+  desc "Build the Android App"
+  lane :android_release do
+    gradle(
+      task: 'bundle',
+      build_type: 'Release'
+    )
+  end
+
+  desc "Submit a new version to the internal track in the Google Play"
+    lane :deploy_internal do
+      gradle(task: "clean")
+      gradle(
+          task: 'bundle',
+          build_type: 'Release'
+      )
+      upload_to_play_store(track: 'internal')
+  end
+end
