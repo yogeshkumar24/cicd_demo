@@ -63,6 +63,8 @@ jobs:
 
       # Run Fastlane for Android Release
       - name: Run Fastlane for Android Release
+        env:
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
         run: |
           cd android/fastlane
           fastlane android_release
