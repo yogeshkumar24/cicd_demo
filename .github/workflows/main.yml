@@ -63,10 +63,17 @@ jobs:
         env:
           GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: service_account.json
 
+      # Print the length (size in bytes) of service_account.json
+      - name: Print length of service_account.json
+        run: |
+          if [ -f android/service_account.json ]; then
+            echo "Length of service_account.json: $(wc -c < android/service_account.json) bytes"
+          else
+            echo "service_account.json not found."
+          fi
+
       # Run Fastlane for Android Release
       - name: Run Fastlane for Android Release
-        env:
-          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: service_account.json
         run: |
           cd android/fastlane
           fastlane android_release
