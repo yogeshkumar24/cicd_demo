@@ -13,7 +13,6 @@ platform :android do
     gradle(
       task: 'bundle',
       build_type: 'Release',
-      release_status: 'draft',
     )
 
     # Path to the service account JSON
@@ -26,6 +25,7 @@ platform :android do
     upload_to_play_store(
       track: 'internal',
       json_key: json_path,
+      release_status: 'draft',
       aab: aab_path,                # Ensure correct .aab path is specified
       skip_upload_metadata: true,   # Skip metadata upload
       skip_upload_images: true,     # Skip images upload
