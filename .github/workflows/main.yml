@@ -57,15 +57,15 @@ jobs:
           echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
           echo "storeFile=/tmp/my-release-key.jks" >> android/key.properties
 
+      # Create service_account.json for Google Play upload
+      - name: Create service_account.json FROM secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON
+        run: echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" | base64 --decode > service_account.json
+
       # Run Fastlane for Android Release
       - name: Run Fastlane for Android Release
         run: |
           cd android/fastlane
           fastlane android_release
-
-      # Create service_account.json for Google Play upload
-      - name: Create service_account.json FROM secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON
-        run: echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" | base64 --decode > service_account.json
 
       # Upload to Google Play Internal Testing
       - name: Upload to Google Play Internal Testing
