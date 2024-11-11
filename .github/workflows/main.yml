@@ -80,7 +80,7 @@ jobs:
       - name: Run Fastlane for Android Release
         run: |
           cd android/fastlane
-          fastlane android_release
+          fastlane android android_release
 
       # Upload to Google Play Internal Testing
       - name: Upload to Google Play Internal Testing
