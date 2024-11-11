@@ -12,7 +12,8 @@ platform :android do
     gradle(task: "clean")
     gradle(
       task: 'bundle',
-      build_type: 'Release'
+      build_type: 'Release',
+      release_status: 'draft',
     )
 
     # Path to the service account JSON
