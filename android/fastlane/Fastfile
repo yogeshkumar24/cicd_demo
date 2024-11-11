@@ -1,11 +1,44 @@
-platform :android do
-  desc "Build the Android App"
-  lane :android_release do
-    gradle(
-      task: 'bundle',
-      build_type: 'Release'
-    )
+require 'yaml'
+
+
+class Properties < Hash
+  def initialize(file)
+    if File.exist?(file)
+      File.foreach(file) do |line|
+        key, value = line.chomp.split('=', 2)
+        self[key] = value
+      end
+    end
   end
+
+  def store(file)
+    File.open(file, 'w') do |f|
+      each do |key, value|
+        f.puts "#{key}=#{value}"
+      end
+    end
+  end
+end
+
+      desc "Increment version code in local.properties"
+      lane :increment_version_code do
+        # Determine the path to the local.properties file
+        local_properties_path = File.join(File.dirname(__FILE__), "../local.properties")
+
+        # Load the properties from the local.properties file
+        local_properties = Properties.new(local_properties_path)
+
+        # Retrieve the current version code, increment it, and update the file
+        current_version_code = local_properties['flutter.versionCode']&.to_i || 1
+        new_version_code = current_version_code + 1
+        local_properties['flutter.versionCode'] = new_version_code.to_s
+
+        # Save the updated properties back to the file
+        local_properties.store(local_properties_path)
+
+        UI.message("Version code updated from #{current_version_code} to #{new_version_code}")
+      end
+
 
   desc "Submit a new version to the internal track in Google Play"
   lane :deploy_internal do
@@ -35,4 +68,9 @@ platform :android do
     # Clean up the service account JSON after use
     sh "rm #{json_path}"
   end
+
+  lane :build_and_deploy do
+      increment_version_code
+      deploy_internal
+    end
 end

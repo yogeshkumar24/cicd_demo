@@ -79,17 +79,11 @@ jobs:
             echo "service_account.json not found."
           fi
 
-      # Run Fastlane for Android Release
-      - name: Run Fastlane for Android Release
-        run: |
-          cd android/fastlane
-          fastlane android android_release
-
       # Upload to Google Play Internal Testing
       - name: Upload to Google Play Internal Testing
         run: |
           cd android/fastlane
-          fastlane android deploy_internal
+          fastlane android build_and_deploy
 
       # Push to GitHub Releases
       - name: Push to Releases
