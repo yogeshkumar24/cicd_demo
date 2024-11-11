@@ -17,6 +17,11 @@ platform :android do
       build_type: 'Release'
     )
 
+    # Check if the service account JSON is provided
+    if ENV["GOOGLE_PLAY_SERVICE_ACCOUNT_JSON"].to_s.strip.empty?
+      UI.user_error!("GOOGLE_PLAY_SERVICE_ACCOUNT_JSON is not set or is empty!")
+    end
+
     # Decode the base64-encoded service account JSON and save to a file
     decoded_json = Base64.decode64(ENV["GOOGLE_PLAY_SERVICE_ACCOUNT_JSON"])
     File.open("service-account.json", "w") { |file| file.write(decoded_json) }
