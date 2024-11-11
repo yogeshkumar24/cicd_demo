@@ -17,16 +17,10 @@ platform :android do
       build_type: 'Release'
     )
 
-    if ENV["GOOGLE_PLAY_SERVICE_ACCOUNT_JSON"].to_s.strip.empty?
-      UI.user_error!("Hey hey GOOGLE_PLAY_SERVICE_ACCOUNT_JSON is not set or is empty!")
-    else
-      decoded_json = Base64.decode64(ENV["GOOGLE_PLAY_SERVICE_ACCOUNT_JSON"])
-      File.open("service-account.json", "w") { |file| file.write(decoded_json) }
-    end
     # Upload to the internal track
     upload_to_play_store(
       track: 'internal',
-      json_key: "service-account.json"
+      json_key: ENV["GOOGLE_PLAY_SERVICE_ACCOUNT_JSON"]
     )
 
     # Optional: Clean up the service account JSON after use
