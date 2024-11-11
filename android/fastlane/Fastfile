@@ -1,5 +1,3 @@
-# android/fastlane/Fastfile
-
 default_platform(:android)
 
 platform :android do
@@ -12,12 +10,24 @@ platform :android do
   end
 
   desc "Submit a new version to the internal track in the Google Play"
-    lane :deploy_internal do
-      gradle(task: "clean")
-      gradle(
-          task: 'bundle',
-          build_type: 'Release'
-      )
-      upload_to_play_store(track: 'internal')
+  lane :deploy_internal do
+    gradle(task: "clean")
+    gradle(
+      task: 'bundle',
+      build_type: 'Release'
+    )
+
+    # Decode the base64-encoded service account JSON and save to a file
+    decoded_json = Base64.decode64(ENV["GOOGLE_PLAY_SERVICE_ACCOUNT_JSON"])
+    File.open("service-account.json", "w") { |file| file.write(decoded_json) }
+
+    # Upload to the internal track
+    upload_to_play_store(
+      track: 'internal',
+      json_key: "service-account.json"
+    )
+
+    # Optional: Clean up the service account JSON after use
+    sh "rm service-account.json"
   end
 end
