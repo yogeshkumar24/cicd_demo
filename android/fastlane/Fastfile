@@ -45,7 +45,7 @@ config = YAML.load_file('../../config.yml')
 lane :deploy_to_firebase do
     firebase_app_distribution(
       app: config['firebase_app_id'],
-      aab_path: "../build/app/outputs/bundle/release/app-release.aab",
+      android_artifact_path: "../build/app/outputs/bundle/release/app-release.aab",
       testers: config['testers_email'],
       release_notes: releaseConfig['release_note'],
       firebase_cli_path: "/usr/local/bin/firebase"
