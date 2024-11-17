@@ -45,10 +45,12 @@ config = YAML.load_file('../../config.yml')
 lane :deploy_to_firebase do
   # Decode the Firebase service account JSON from base64 and write it to a file
 #   service_account_json = ENV['FIREBASE_SERVICE_ACCOUNT']
-  temp_json_path = '/tmp/firebase-service-account.json'
+#   temp_json_path = '/tmp/firebase-service-account.json'
+#
+#   # Set the GOOGLE_APPLICATION_CREDENTIALS environment variable to the temp file path
+#   ENV['GOOGLE_APPLICATION_CREDENTIALS'] = temp_json_path
 
-  # Set the GOOGLE_APPLICATION_CREDENTIALS environment variable to the temp file path
-  ENV['GOOGLE_APPLICATION_CREDENTIALS'] = temp_json_path
+firebase_service_account_path = ENV['GOOGLE_APPLICATION_CREDENTIALS']
 
   # Now you can call firebase_app_distribution with proper authentication
   firebase_app_distribution(
@@ -56,7 +58,8 @@ lane :deploy_to_firebase do
     android_artifact_path: "../build/app/outputs/bundle/release/app-release.aab",
     testers: config['testers_email'],
     release_notes: releaseConfig['release_note'],
-    firebase_cli_path: "/usr/local/bin/firebase"
+    firebase_cli_path: "/usr/local/bin/firebase",
+    service_credentials_file: firebase_service_account_path
   )
 
   # Clean up the service account file after use
