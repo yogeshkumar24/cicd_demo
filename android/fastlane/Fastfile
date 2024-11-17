@@ -52,6 +52,17 @@ lane :deploy_to_firebase do
 
 firebase_service_account_path = ENV['GOOGLE_APPLICATION_CREDENTIALS']
 
+ # Debugging: Check if Firebase credentials and app ID are set
+  UI.message("Firebase App ID: #{ENV['FIREBASE_APP_ID']}")
+  UI.message("Firebase service account JSON path: #{ENV['GOOGLE_APPLICATION_CREDENTIALS']}")
+
+  # Debugging: Check if the file exists and has content
+  if File.exist?(ENV['GOOGLE_APPLICATION_CREDENTIALS'])
+    UI.message("Service account JSON exists at #{ENV['GOOGLE_APPLICATION_CREDENTIALS']}")
+  else
+    UI.error("Service account JSON file not found at #{ENV['GOOGLE_APPLICATION_CREDENTIALS']}")
+  end
+
   # Now you can call firebase_app_distribution with proper authentication
   firebase_app_distribution(
     app: ENV['FIREBASE_APP_ID'],
