@@ -39,8 +39,8 @@ platform :android do
     UI.message("Version code updated from #{current_version_code} to #{new_version_code}")
   end
 
-releaseConfig = YAML.load_file('release_notes.yml')
-config = YAML.load_file('config.yml')
+releaseConfig = YAML.load_file('../../release_notes.yml')
+config = YAML.load_file('../../config.yml')
 
 lane :deploy_to_firebase do
     firebase_app_distribution(
