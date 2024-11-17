@@ -1,0 +1,95 @@
+name: Build & Release
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  build-and-release:
+    name: Build, Test & Release with Fastlane
+    runs-on: macos-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Set up Java (required for Android build)
+      - name: Set up Java 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '11'
+
+      # Set up Flutter environment
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          architecture: x64
+
+      # Install dependencies
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Install Fastlane
+      - name: Install Fastlane
+        run: gem install fastlane
+
+      # Decode and set up Keystore for signing the Android app
+      - name: Decode and set up Keystore
+        env:
+          KEYSTORE: ${{ secrets.KEYSTORE }}
+        run: |
+          echo "$KEYSTORE" | base64 --decode > /tmp/my-release-key.jks
+
+      # Set up signing config for Android build
+      - name: Set up signing config
+        run: |
+          mkdir -p android/app
+          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> android/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
+          echo "storeFile=/tmp/my-release-key.jks" >> android/key.properties
+
+      - name: Build Android App Bundle (Signed)
+        run: flutter build appbundle --release
+
+      # Create service_account.json for Google Play upload in /tmp directory
+      - name: Create service_account.json FROM secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON
+        if: github.ref == 'refs/heads/main'
+        run: echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" | base64 --decode > /tmp/service-account.json
+
+      # Debugging: Print the path and size of service_account.json
+      - name: Debugging service_account.json
+        if: github.ref == 'refs/heads/main'
+        run: |
+          if [ -f /tmp/service-account.json ]; then
+            echo "Path of service_account.json: /tmp/service-account.json"
+            echo "Length of service_account.json: $(wc -c < /tmp/service-account.json) bytes"
+          else
+            echo "service_account.json not found."
+          fi
+
+      # Build and deploy based on branch
+      - name: Build and Deploy
+        env:
+          FIREBASE_AUTH_TOKEN: ${{ secrets.FIREBASE_AUTH_TOKEN }}
+        run: |
+          cd android/fastlane
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "Starting build_and_deploy for main branch..."
+            fastlane android build_and_deploy
+          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/dev" ]]; then
+            echo "Starting deploy_to_firebase for dev branch..."
+            fastlane android deploy_to_firebase
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "Handling pull request, deploying to Firebase..."
+            fastlane android deploy_to_firebase
+          fi
