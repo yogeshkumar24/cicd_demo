@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - main
+      - dev
   pull_request:
     branches:
       - main
+      - dev
 
 jobs:
   build-and-release:
@@ -61,34 +63,28 @@ jobs:
 
       # Create service_account.json for Google Play upload in /tmp directory
       - name: Create service_account.json FROM secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON
+        if: github.ref == 'refs/heads/main'
         run: echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" | base64 --decode > /tmp/service-account.json
-        env:
-          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: service_account.json
 
-      # Print the path of service_account.json for debugging
-      - name: Print path of service_account.json
-        run: |
-          echo "Path of service_account.json: $(pwd)/tmp/service-account.json"
-
-      # Print the length (size in bytes) of service_account.json
-      - name: Print length of service_account.json
+      # Debugging: Print the path and size of service_account.json
+      - name: Debugging service_account.json
+        if: github.ref == 'refs/heads/main'
         run: |
           if [ -f /tmp/service-account.json ]; then
+            echo "Path of service_account.json: /tmp/service-account.json"
             echo "Length of service_account.json: $(wc -c < /tmp/service-account.json) bytes"
           else
             echo "service_account.json not found."
           fi
 
-      # Upload to Google Play Internal Testing
-      - name: Upload to Google Play Internal Testing
+      # Build and deploy based on branch
+      - name: Build and Deploy
+        env:
+          FIREBASE_AUTH_TOKEN: ${{ secrets.FIREBASE_AUTH_TOKEN }}
         run: |
           cd android/fastlane
-          fastlane android build_and_deploy
-
-      # Push to GitHub Releases
-      - name: Push to Releases
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: "build/app/outputs/bundle/release/app-release.aab"
-          tag: v1.0.${{ github.run_number }}
-          token: ${{ secrets.TOKEN }}
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            fastlane android build_and_deploy
+          elif [ "${{ github.ref }}" == "refs/heads/dev" ]; then
+            fastlane android deploy_to_firebase
+          fi
