@@ -83,8 +83,13 @@ jobs:
           FIREBASE_AUTH_TOKEN: ${{ secrets.FIREBASE_AUTH_TOKEN }}
         run: |
           cd android/fastlane
-          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "Starting build_and_deploy for main branch..."
             fastlane android build_and_deploy
-          elif [ "${{ github.ref }}" == "refs/heads/dev" ]; then
+          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/dev" ]]; then
+            echo "Starting deploy_to_firebase for dev branch..."
+            fastlane android deploy_to_firebase
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "Handling pull request, deploying to Firebase..."
             fastlane android deploy_to_firebase
           fi
