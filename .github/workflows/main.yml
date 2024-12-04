@@ -62,6 +62,11 @@ jobs:
       - name: Build Android App Bundle (Signed)
         run: flutter build appbundle --release
 
+              # Create service_account.json for Google Play upload in /tmp directory
+      - name: Create service_account.json FROM secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON
+        if: github.ref == 'refs/heads/main'
+        run: echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" | base64 --decode > /tmp/service-account.json
+
       # Decode and set up Firebase service account credentials
       - name: Create firebase_service_account.json FROM secrets.FIREBASE_SERVICE_ACCOUNT
         run: echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > /tmp/firebase-service-account.json
