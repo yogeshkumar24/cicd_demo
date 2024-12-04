@@ -62,35 +62,9 @@ jobs:
       - name: Build Android App Bundle (Signed)
         run: flutter build appbundle --release
 
-      # Create service_account.json for Google Play upload in /tmp directory
-      - name: Create service_account.json FROM secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON
-        if: github.ref == 'refs/heads/main'
-        run: echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" | base64 --decode > /tmp/service-account.json
-
-      # Debugging: Print the path and size of service_account.json
-      - name: Debugging service_account.json
-        if: github.ref == 'refs/heads/main'
-        run: |
-          if [ -f /tmp/service-account.json ]; then
-            echo "Path of service_account.json: /tmp/service-account.json"
-            echo "Length of service_account.json: $(wc -c < /tmp/service-account.json) bytes"
-          else
-            echo "service_account.json not found."
-          fi
-
       # Decode and set up Firebase service account credentials
       - name: Create firebase_service_account.json FROM secrets.FIREBASE_SERVICE_ACCOUNT
         run: echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > /tmp/firebase-service-account.json
-
-      # Debugging: Print the path and size of firebase-service-account.json
-      - name: Debugging firebase-service-account.json
-        run: |
-          if [ -f /tmp/firebase-service-account.json ]; then
-            echo "Path of firebase-service-account.json: /tmp/firebase-service-account.json"
-            echo "Length of firebase-service-account.json: $(wc -c < /tmp/firebase-service-account.json) bytes"
-          else
-            echo "firebase-service-account.json not found."
-          fi
 
       # Build and deploy based on branch
       - name: Build and Deploy
