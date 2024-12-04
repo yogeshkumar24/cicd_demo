@@ -15,13 +15,21 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 ## Android
 
-### android android_release
+### android increment_version_code
 
 ```sh
-[bundle exec] fastlane android android_release
+[bundle exec] fastlane android increment_version_code
 ```
 
-Build the Android App
+Increment version code in local.properties
+
+### android deploy_to_firebase
+
+```sh
+[bundle exec] fastlane android deploy_to_firebase
+```
+
+
 
 ### android deploy_internal
 
@@ -29,7 +37,15 @@ Build the Android App
 [bundle exec] fastlane android deploy_internal
 ```
 
-Submit a new version to the internal track in the Google Play
+Submit a new version to the internal track in Google Play
+
+### android build_and_deploy
+
+```sh
+[bundle exec] fastlane android build_and_deploy
+```
+
+
 
 ----
 

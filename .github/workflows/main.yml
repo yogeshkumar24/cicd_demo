@@ -58,6 +58,7 @@ jobs:
           echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
           echo "storeFile=/tmp/my-release-key.jks" >> android/key.properties
 
+      # Build Android App Bundle (Signed)
       - name: Build Android App Bundle (Signed)
         run: flutter build appbundle --release
 
@@ -77,10 +78,26 @@ jobs:
             echo "service_account.json not found."
           fi
 
+      # Decode and set up Firebase service account credentials
+      - name: Create firebase_service_account.json FROM secrets.FIREBASE_SERVICE_ACCOUNT
+        run: echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > /tmp/firebase-service-account.json
+
+      # Debugging: Print the path and size of firebase-service-account.json
+      - name: Debugging firebase-service-account.json
+        run: |
+          if [ -f /tmp/firebase-service-account.json ]; then
+            echo "Path of firebase-service-account.json: /tmp/firebase-service-account.json"
+            echo "Length of firebase-service-account.json: $(wc -c < /tmp/firebase-service-account.json) bytes"
+          else
+            echo "firebase-service-account.json not found."
+          fi
+
       # Build and deploy based on branch
       - name: Build and Deploy
         env:
           FIREBASE_AUTH_TOKEN: ${{ secrets.FIREBASE_AUTH_TOKEN }}
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/firebase-service-account.json
         run: |
           cd android/fastlane
           if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
