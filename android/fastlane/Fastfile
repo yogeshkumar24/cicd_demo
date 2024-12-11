@@ -63,13 +63,21 @@ lane :deploy_to_firebase do
 #     UI.error("Service account JSON file not found at #{ENV['GOOGLE_APPLICATION_CREDENTIALS']}")
 #   end
 
+#   ls -la /tmp
+#   cat /tmp/firebase-service-account.json
+
+#   UI.message("Firebase App ID: #{ENV['FIREBASE_APP_ID']}")
+#   UI.message("Google Application Credentials Path: #{ENV['GOOGLE_APPLICATION_CREDENTIALS']}")
+
   # Now you can call firebase_app_distribution with proper authentication
   firebase_app_distribution(
     app: "1:20776683668:android:c26ea26c5e1a869dddcc81",
-    android_artifact_path: "../build/app/outputs/bundle/release/app-release.aab",
-    testers: config['testers_email'],
-    release_notes: releaseConfig['release_note'],
-    firebase_cli_path: "/usr/local/bin/firebase",
+    apk_path:"../build/app/outputs/flutter-apk/app-release.apk",
+    testers:"dkofficial24@gmail.com",
+    release_notes:"Hey",
+#     testers: config['testers_email'],
+#     release_notes: releaseConfig['release_note'],
+    debug: true
   )
 
   # Clean up the service account file after use
