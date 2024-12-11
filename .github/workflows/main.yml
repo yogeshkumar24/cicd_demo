@@ -58,17 +58,14 @@ jobs:
           echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
           echo "storeFile=/tmp/my-release-key.jks" >> android/key.properties
 
-      # Build Android App Bundle (Signed)
-      - name: Build Android App Bundle (Signed)
-        run: flutter build appbundle --release
-
-              # Create service_account.json for Google Play upload in /tmp directory
+      # Create service_account.json for Google Play upload in /tmp directory
       - name: Create service_account.json FROM secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON
         if: github.ref == 'refs/heads/main'
         run: echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" | base64 --decode > /tmp/service-account.json
 
-      # Decode and set up Firebase service account credentials
-      - name: Create firebase_service_account.json FROM secrets.FIREBASE_SERVICE_ACCOUNT
+
+      # Create Firebase service account credentials
+      - name: Create firebase_service_account.json
         run: echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > /tmp/firebase-service-account.json
 
       # Build and deploy based on branch
@@ -80,12 +77,15 @@ jobs:
         run: |
           cd android/fastlane
           if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "Starting build_and_deploy for main branch..."
+            echo "Building and deploying for main branch..."
+            flutter build appbundle --release
             fastlane android build_and_deploy
           elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/dev" ]]; then
-            echo "Starting deploy_to_firebase for dev branch..."
+            echo "Building APK and deploying for dev branch..."
+            flutter build apk --release
             fastlane android deploy_to_firebase
           elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "Handling pull request, deploying to Firebase..."
+            echo "Building APK and deploying for pull request..."
+            flutter build apk --release
             fastlane android deploy_to_firebase
           fi
